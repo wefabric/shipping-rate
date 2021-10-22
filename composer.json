@@ -1,0 +1,33 @@
+{
+  "name": "wefabric/shipping-rate",
+  "description": "Shipping rates system",
+  "type": "library",
+  "authors": [
+    {
+      "name": "Leo Flapper",
+      "email": "leo@wefabric.nl"
+    }
+  ],
+  "minimum-stability": "dev",
+  "require": {
+    "php": "^7.1|8.*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Wefabric\\ShippingRate\\": "src"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Wefabric\\ShippingRate\\ShippingRateServiceProvider"
+      ],
+      "aliases": {
+        "ShippingRateManager": "Wefabric\\ShippingRate\\ShippingRateManagerFacade"
+      }
+    }
+  },
+  "config": {
+    "sort-packages": true
+  }
+}
