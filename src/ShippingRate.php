@@ -8,11 +8,10 @@
 
 namespace Wefabric\ShippingRate;
 
-use Domains\Meta\MetaCollection;
-use Domains\Meta\MetaItem;
+use Wefabric\ShippingRate\Meta\MetaCollection;
+use Wefabric\ShippingRate\Meta\MetaItem;
 use Wefabric\Countries\Countries\Country;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Support\Collection;
 use Wefabric\Countries\CountryManager;
 
 class ShippingRate implements ShippingRateInterface, Arrayable
