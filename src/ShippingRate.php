@@ -28,6 +28,12 @@ class ShippingRate implements ShippingRateInterface, Arrayable
 
 
     /**
+     * @var float|null
+     */
+    protected ?float $taxRate = null;
+
+
+    /**
      * @var string
      */
     protected string $label = '';
@@ -80,16 +86,26 @@ class ShippingRate implements ShippingRateInterface, Arrayable
                 'country_id' => $countryId,
                 'free_shipping_threshold' => $freeShippingThreshold,
                 'description' => $description,
-                'disabled' => $disabled,
-                'disabled_reason' => $disabledReason,
+                'disabled' => $disabled ?? false,
+                'disabled_reason' => $disabledReason ?? '',
                 'meta' => $meta
             ];
 
         }
 
+        if(isset($data['title']) && !isset($data['label'])) {
+            $data['label'] = $data['title'];
+        }
+
+        if(isset($data['free_threshold']) && !isset($data['free_shipping_threshold'])) {
+            $data['free_shipping_threshold'] = $data['free_threshold'];
+        }
+
+        if($data['meta'] === null) {
+            $data['meta'] = [];
+        }
+
         $this->fromArray($data);
-
-
 
     }
 
@@ -123,6 +139,23 @@ class ShippingRate implements ShippingRateInterface, Arrayable
     public function setRate(float $rate)
     {
         $this->rate = $rate;
+    }
+
+    /**
+     * @param float $price
+     * @return bool
+     */
+    public function isFree(float $price)
+    {
+        if(!$this->hasFreeShippingThreshold()) {
+            return false;
+        }
+
+        if($price >= $this->getFreeShippingThreshold()) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -186,7 +219,19 @@ class ShippingRate implements ShippingRateInterface, Arrayable
      */
     public function getTaxRate(): float
     {
-        return $this->getCountry()->getTaxRate();
+        if(!$this->taxRate) {
+            $this->taxRate = $this->getCountry()->getTaxRate();
+        }
+        return $this->taxRate;
+    }
+
+    /**
+     * @param float $taxRate
+     * @return float
+     */
+    public function setTaxRate(float $taxRate): float
+    {
+        return $this->taxRate = $taxRate;
     }
 
     /**
@@ -267,11 +312,11 @@ class ShippingRate implements ShippingRateInterface, Arrayable
     }
 
     /**
-     * @param string $disabledReason
+     * @param string|null $disabledReason
      */
-    public function setDisabledReason(string $disabledReason = ''): void
+    public function setDisabledReason(string|null $disabledReason = ''): void
     {
-        $this->disabledReason = $disabledReason;
+        $this->disabledReason = (string)$disabledReason;
     }
 
     /**
@@ -294,7 +339,7 @@ class ShippingRate implements ShippingRateInterface, Arrayable
         if(is_array($meta)) {
             $metaCollection = new MetaCollection();
             foreach ($meta as $key => $value){
-                $metaCollection->push(new MetaItem($key, $value));
+                $metaCollection->put($key, $value);
             }
             $meta = $metaCollection;
         }
